@@ -2,7 +2,7 @@
 
 This repository contains example JavaScript code for authenticating with and using the BandTools REST API.
 It is intended as a practical starting point for developers who want to build their own integrations with BandTools.
-This is example code rather than an official SDK. The [BandTools API reference](https://bandtools.app/api/v1) remains the source of truth for supported endpoints, request formats, and response formats.
+This is example code rather than an official SDK. The [BandTools API reference](https://bandtools.app/help/api) remains the source of truth for supported endpoints, request formats, and response formats.
 
 ## Requirements
 
