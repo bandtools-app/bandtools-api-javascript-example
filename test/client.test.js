@@ -67,6 +67,32 @@ test("client from environment falls back to production API URL", async () => {
   }
 });
 
+test("account responses include plan features", async () => {
+  const fetchImpl = createFetch(
+    jsonResponse({
+      data: {
+        id: "acct_123",
+        features: {
+          automatic_newsletters: true,
+          duplicate_newsletter: true,
+          subscriber_limit: 1000,
+          unlimited_newsletters: true,
+        },
+      },
+    }),
+  );
+  const client = new BandToolsClient("test-token", {
+    baseUrl: "https://example.test/api/v1",
+    fetchImpl,
+  });
+
+  const result = await client.account.get();
+
+  assert.equal(result.data.features.automatic_newsletters, true);
+  assert.equal(result.data.features.subscriber_limit, 1000);
+  assert.equal(fetchImpl.calls[0].url, "https://example.test/api/v1/account");
+});
+
 test("GET requests include auth headers and query params", async () => {
   const fetchImpl = createFetch();
   const client = new BandToolsClient("test-token", {

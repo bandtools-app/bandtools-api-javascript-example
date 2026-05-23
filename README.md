@@ -80,6 +80,7 @@ Read and update account, app, newsletter, theme, page design, and confirmation e
 ```js
 const account = await client.account.get();
 console.log(account);
+console.log(account.data.features.subscriber_limit);
 
 await client.account.update({
   account: {
