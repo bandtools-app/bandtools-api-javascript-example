@@ -81,11 +81,29 @@ Read and update account, app, newsletter, theme, page design, and confirmation e
 const account = await client.account.get();
 console.log(account);
 console.log(account.data.features.subscriber_limit);
+console.log(account.data.social_links);
 
 await client.account.update({
   account: {
     name: "Example Band",
     website_url: "https://example.com",
+    social_links: {
+      bandcamp: "https://example.bandcamp.com",
+      instagram: "https://instagram.com/exampleband",
+      youtube: "https://youtube.com/@exampleband",
+    },
+  },
+});
+
+// Supported social link keys are bandcamp, bluesky, facebook, instagram,
+// soundcloud, spotify, tiktok, x, and youtube. Omit a platform to leave it
+// unchanged, or send null/"" to clear it.
+await client.account.update({
+  account: {
+    social_links: {
+      x: "https://x.com/exampleband",
+      facebook: null,
+    },
   },
 });
 
@@ -93,6 +111,7 @@ await client.account.updateNewsletterSettings({
   newsletter_settings: {
     newsletter_name: "Example Band Updates",
     newsletter_description: "News, tour dates, and releases.",
+    display_social_links_in_footer: true,
   },
 });
 

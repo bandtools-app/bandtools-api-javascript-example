@@ -93,6 +93,78 @@ test("account responses include plan features", async () => {
   assert.equal(fetchImpl.calls[0].url, "https://example.test/api/v1/account");
 });
 
+test("account responses include social profile links", async () => {
+  const fetchImpl = createFetch(
+    jsonResponse({
+      data: {
+        id: "acct_123",
+        social_links: {
+          bandcamp: "https://testuser.bandcamp.com",
+          bluesky: "https://bsky.app/profile/testuser.example",
+          instagram: "https://instagram.com/testuser",
+          soundcloud: "https://soundcloud.com/testuser",
+          spotify: "https://open.spotify.com/artist/example",
+          tiktok: "https://tiktok.com/@testuser",
+          x: "https://x.com/testuser",
+          youtube: "https://youtube.com/@testuser",
+        },
+      },
+    }),
+  );
+  const client = new BandToolsClient("test-token", {
+    baseUrl: "https://example.test/api/v1",
+    fetchImpl,
+  });
+
+  const result = await client.account.get();
+
+  assert.equal(result.data.social_links.bandcamp, "https://testuser.bandcamp.com");
+  assert.equal(result.data.social_links.bluesky, "https://bsky.app/profile/testuser.example");
+  assert.equal(result.data.social_links.x, "https://x.com/testuser");
+});
+
+test("account updates can set and clear social profile links", async () => {
+  const fetchImpl = createFetch(jsonResponse({ data: { id: "acct_123" } }));
+  const client = new BandToolsClient("test-token", {
+    baseUrl: "https://example.test/api/v1",
+    fetchImpl,
+  });
+
+  await client.account.update({
+    account: {
+      social_links: {
+        bandcamp: "https://testuser.bandcamp.com",
+        bluesky: "https://bsky.app/profile/testuser.example",
+        facebook: null,
+        instagram: "",
+        soundcloud: "https://soundcloud.com/testuser",
+        spotify: "https://open.spotify.com/artist/example",
+        tiktok: "https://tiktok.com/@testuser",
+        x: "https://x.com/testuser",
+        youtube: "https://youtube.com/@testuser",
+      },
+    },
+  });
+
+  assert.equal(fetchImpl.calls[0].url, "https://example.test/api/v1/account");
+  assert.equal(fetchImpl.calls[0].init.method, "PATCH");
+  assert.deepEqual(JSON.parse(fetchImpl.calls[0].init.body), {
+    account: {
+      social_links: {
+        bandcamp: "https://testuser.bandcamp.com",
+        bluesky: "https://bsky.app/profile/testuser.example",
+        facebook: null,
+        instagram: "",
+        soundcloud: "https://soundcloud.com/testuser",
+        spotify: "https://open.spotify.com/artist/example",
+        tiktok: "https://tiktok.com/@testuser",
+        x: "https://x.com/testuser",
+        youtube: "https://youtube.com/@testuser",
+      },
+    },
+  });
+});
+
 test("GET requests include auth headers and query params", async () => {
   const fetchImpl = createFetch();
   const client = new BandToolsClient("test-token", {
