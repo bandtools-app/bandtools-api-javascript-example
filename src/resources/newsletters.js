@@ -108,9 +108,9 @@ export class NewslettersResource {
     return this.transport.requestJson("GET", "/shared-newsletters");
   }
 
-  uploadAttachment(filePath) {
+  uploadAttachment(filePath, { contentType } = {}) {
     return this.transport.requestJson("POST", "/newsletters/attachments", {
-      fileUpload: { filePath },
+      fileUpload: { filePath, contentType },
     });
   }
 }

@@ -10,6 +10,13 @@ const CONTENT_TYPES = new Map([
   [".gif", "image/gif"],
   [".jpeg", "image/jpeg"],
   [".jpg", "image/jpeg"],
+  [".m4a", "audio/mp4"],
+  [".m4v", "video/mp4"],
+  [".mp3", "audio/mpeg"],
+  [".mp4", "video/mp4"],
+  [".mpeg", "video/mpeg"],
+  [".mpg", "video/mpeg"],
+  [".pdf", "application/pdf"],
   [".png", "image/png"],
   [".webp", "image/webp"],
 ]);

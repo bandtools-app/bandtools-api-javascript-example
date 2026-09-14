@@ -244,6 +244,47 @@ test("file uploads use multipart FormData", async () => {
   assert.equal(fetchImpl.calls[0].init.headers["Content-Type"], undefined);
 });
 
+test("attachment uploads use API-supported content types", async () => {
+  const fetchImpl = createFetch(jsonResponse({ data: { id: "att_123" } }, { status: 201 }));
+  const client = new BandToolsClient("test-token", {
+    baseUrl: "https://example.test/api/v1",
+    fetchImpl,
+  });
+  const directory = await mkdtemp(join(tmpdir(), "bandtools-js-test-"));
+
+  for (const [extension, contentType] of [
+    ["pdf", "application/pdf"],
+    ["m4a", "audio/mp4"],
+    ["mp3", "audio/mpeg"],
+    ["mp4", "video/mp4"],
+    ["mpeg", "video/mpeg"],
+  ]) {
+    const filePath = join(directory, `attachment.${extension}`);
+    await writeFile(filePath, "attachment-bytes");
+    await client.newsletters.uploadAttachment(filePath);
+
+    assert.equal(fetchImpl.calls.at(-1).init.body.get("file").type, contentType);
+  }
+});
+
+test("newsletter updates pass collaborator lock versions", async () => {
+  const fetchImpl = createFetch(jsonResponse({ data: { id: "nws_123" } }));
+  const client = new BandToolsClient("test-token", {
+    baseUrl: "https://example.test/api/v1",
+    fetchImpl,
+  });
+
+  await client.newsletters.update("nws_123", {
+    subject: "Updated subject",
+    lock_version: 7,
+  });
+
+  assert.deepEqual(JSON.parse(fetchImpl.calls[0].init.body), {
+    subject: "Updated subject",
+    lock_version: 7,
+  });
+});
+
 test("newsletter operations use schema paths and bodies", async () => {
   const fetchImpl = createFetch(jsonResponse({ data: { id: "nws_123" } }, { status: 202 }));
   const client = new BandToolsClient("test-token", {

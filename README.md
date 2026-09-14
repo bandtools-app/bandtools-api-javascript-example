@@ -173,6 +173,17 @@ await client.newsletters.removeFromArchive(newsletterId);
 await client.newsletters.delete(copyId);
 ```
 
+When updating a shared draft as a collaborator, first load the newsletter and
+include its current `lock_version`. Owners may omit this field.
+
+```js
+const latest = await client.newsletters.get(newsletterId);
+await client.newsletters.update(newsletterId, {
+  message: "<p>Updated by a collaborator.</p>",
+  lock_version: latest.data.lock_version,
+});
+```
+
 A previously sent newsletter can also be sent only to subscribers who joined after the original send.
 
 ```js
@@ -197,8 +208,16 @@ console.log(collaborators, lock);
 
 Uploads accept filesystem paths.
 
+Newsletter attachments can be PDF, JPEG, PNG, GIF, WebP, MP3, MP4, or MPEG
+video files up to 20 MiB. The content type is inferred from the filename; pass
+`contentType` when the filename does not identify it or when uploading MP4
+audio.
+
 ```js
 const attachment = await client.newsletters.uploadAttachment("poster.jpg");
+const audio = await client.newsletters.uploadAttachment("track.bin", {
+  contentType: "audio/mp4",
+});
 console.log(attachment);
 
 await client.account.uploadPicture("profile.png");
