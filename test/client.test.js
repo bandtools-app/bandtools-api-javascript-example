@@ -267,6 +267,21 @@ test("attachment uploads use API-supported content types", async () => {
   }
 });
 
+test("attachment uploads allow an explicit content type override", async () => {
+  const fetchImpl = createFetch(jsonResponse({ data: { id: "att_123" } }, { status: 201 }));
+  const client = new BandToolsClient("test-token", {
+    baseUrl: "https://example.test/api/v1",
+    fetchImpl,
+  });
+  const directory = await mkdtemp(join(tmpdir(), "bandtools-js-test-"));
+  const filePath = join(directory, "track.bin");
+  await writeFile(filePath, "audio-bytes");
+
+  await client.newsletters.uploadAttachment(filePath, { contentType: "audio/mp4" });
+
+  assert.equal(fetchImpl.calls[0].init.body.get("file").type, "audio/mp4");
+});
+
 test("newsletter updates pass collaborator lock versions", async () => {
   const fetchImpl = createFetch(jsonResponse({ data: { id: "nws_123" } }));
   const client = new BandToolsClient("test-token", {
