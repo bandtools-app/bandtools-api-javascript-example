@@ -147,6 +147,11 @@ const draft = await client.newsletters.create({
 await client.newsletters.sendPreview(draft.data.id);
 ```
 
+Creation also accepts `scheduled_for` when the account has the scheduling
+feature. The time must be in the future, on a whole hour, and within 32 days.
+Newsletter attachment references in `message` must use the opaque id returned
+by `uploadAttachment`; native Action Text or Trix payloads are rejected.
+
 Newsletter drafts can be updated, duplicated, scheduled, sent, archived, pinned, and deleted.
 
 ```js
@@ -211,7 +216,8 @@ Uploads accept filesystem paths.
 Newsletter attachments can be PDF, JPEG, PNG, GIF, WebP, MP3, MP4, or MPEG
 video files up to 20 MiB. The content type is inferred from the filename; pass
 `contentType` when the filename does not identify it or when uploading MP4
-audio.
+audio. Uploads allow up to 120 seconds by default; customise this with the
+client's `uploadTimeout` option when needed.
 
 ```js
 const attachment = await client.newsletters.uploadAttachment("poster.jpg");

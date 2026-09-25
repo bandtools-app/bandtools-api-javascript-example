@@ -16,10 +16,11 @@ export class BandToolsClient {
     {
       baseUrl = BandToolsClient.DEFAULT_BASE_URL,
       timeout = 30_000,
+      uploadTimeout = 120_000,
       fetchImpl = globalThis.fetch,
     } = {},
   ) {
-    this.transport = new Transport(apiToken, { baseUrl, timeout, fetchImpl });
+    this.transport = new Transport(apiToken, { baseUrl, timeout, uploadTimeout, fetchImpl });
     this.subscribers = new SubscribersResource(this.transport);
     this.account = new AccountResource(this.transport);
     this.newsletters = new NewslettersResource(this.transport);

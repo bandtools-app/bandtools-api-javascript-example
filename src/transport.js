@@ -25,7 +25,10 @@ const CONTENT_TYPES = new Map([
  * Shared HTTP transport for BandTools resource clients.
  */
 export class Transport {
-  constructor(apiToken, { baseUrl, timeout = 30_000, fetchImpl = globalThis.fetch } = {}) {
+  constructor(
+    apiToken,
+    { baseUrl, timeout = 30_000, uploadTimeout = 120_000, fetchImpl = globalThis.fetch } = {},
+  ) {
     if (!apiToken) {
       throw new TypeError("apiToken is required");
     }
@@ -36,6 +39,7 @@ export class Transport {
     this.apiToken = apiToken;
     this.baseUrl = (baseUrl ?? "https://bandtools.app/api/v1").replace(/\/+$/, "");
     this.timeout = timeout;
+    this.uploadTimeout = uploadTimeout;
     this.fetchImpl = fetchImpl;
   }
 
@@ -69,7 +73,7 @@ export class Transport {
     const init = {
       method,
       headers,
-      signal: AbortSignal.timeout(this.timeout),
+      signal: AbortSignal.timeout(fileUpload === undefined ? this.timeout : this.uploadTimeout),
     };
 
     if (jsonBody !== undefined) {

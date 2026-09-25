@@ -244,6 +244,21 @@ test("file uploads use multipart FormData", async () => {
   assert.equal(fetchImpl.calls[0].init.headers["Content-Type"], undefined);
 });
 
+test("file uploads use the API upload timeout by default", async () => {
+  const fetchImpl = createFetch(jsonResponse({ data: { id: "att_123" } }, { status: 201 }));
+  const client = new BandToolsClient("test-token", {
+    baseUrl: "https://example.test/api/v1",
+    fetchImpl,
+  });
+
+  assert.equal(client.transport.uploadTimeout, 120_000);
+  const directory = await mkdtemp(join(tmpdir(), "bandtools-js-test-"));
+  const filePath = join(directory, "cover.jpg");
+  await writeFile(filePath, "image-bytes");
+  await client.newsletters.uploadAttachment(filePath);
+  assert.equal(fetchImpl.calls[0].init.signal.constructor.name, "AbortSignal");
+});
+
 test("attachment uploads use API-supported content types", async () => {
   const fetchImpl = createFetch(jsonResponse({ data: { id: "att_123" } }, { status: 201 }));
   const client = new BandToolsClient("test-token", {
